@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "333096416485",
+    "firebase_url": "https://distribuidoraapp-f0815-default-rtdb.firebaseio.com",
+    "project_id": "distribuidoraapp-f0815",
+    "storage_bucket": "distribuidoraapp-f0815.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:333096416485:android:b4ff1ea8991226d137900c",
+        "android_client_info": {
+          "package_name": "com.tuempresa.distribuidora"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgbAzyitGfhEBYP4haPojfhXNyL5UnMSM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
