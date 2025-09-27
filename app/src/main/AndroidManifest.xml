@@ -14,13 +14,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
-        <!-- Pantalla de menú -->
-        <activity android:name=".MenuActivity" />
+        <!-- Pantalla de registro -->
+        <activity android:name=".RegisterActivity" />
 
         <!-- Pantalla principal -->
-        <activity
-            android:name=".MainActivity"
-            android:exported="true" />
+        <activity android:name=".MainActivity" />
 
         <!-- Pantalla de login (launcher) -->
         <activity

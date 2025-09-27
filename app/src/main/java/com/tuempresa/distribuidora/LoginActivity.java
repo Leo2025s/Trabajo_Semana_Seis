@@ -1,27 +1,20 @@
 package com.tuempresa.distribuidora;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginActivity extends AppCompatActivity {
 
     private EditText etEmail, etPassword;
-    private Button btnLogin, btnRegister;
-    private TextView tvStatus;
-
+    private Button btnLogin, btnGoRegister;
     private FirebaseAuth mAuth;
 
     @Override
@@ -29,68 +22,39 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Inicializar Firebase
         mAuth = FirebaseAuth.getInstance();
 
-        // Referencias a los controles
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
-        btnRegister = findViewById(R.id.btnRegister);
-        tvStatus = findViewById(R.id.tvStatus);
+        btnGoRegister = findViewById(R.id.btnGoRegister);
 
-        // Evento de login
-        btnLogin.setOnClickListener(v -> loginUser());
+        // Botón de login
+        btnLogin.setOnClickListener(v -> {
+            String email = etEmail.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
 
-        // Evento de registro
-        btnRegister.setOnClickListener(v -> registerUser());
-    }
+            if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
+                Toast.makeText(LoginActivity.this, "Completa todos los campos", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-    private void loginUser() {
-        String email = etEmail.getText().toString().trim();
-        String password = etPassword.getText().toString().trim();
+            mAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(LoginActivity.this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                            finish();
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+        });
 
-        if (email.isEmpty() || password.isEmpty()) {
-            tvStatus.setText("⚠ Ingresa correo y contraseña.");
-            return;
-        }
-
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        tvStatus.setText("✔ Login exitoso.");
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                        finish();
-                    } else {
-                        tvStatus.setText("❌ Error en login: " + task.getException().getMessage());
-                        Log.e("LOGIN", "Error: ", task.getException());
-                    }
-                });
-    }
-
-    private void registerUser() {
-        String email = etEmail.getText().toString().trim();
-        String password = etPassword.getText().toString().trim();
-
-        if (email.isEmpty() || password.isEmpty()) {
-            tvStatus.setText("⚠ Ingresa correo y contraseña.");
-            return;
-        }
-
-        if (password.length() < 6) {
-            tvStatus.setText("⚠ La contraseña debe tener al menos 6 caracteres.");
-            return;
-        }
-
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        tvStatus.setText("✔ Usuario registrado. Ahora puedes iniciar sesión.");
-                        Toast.makeText(LoginActivity.this, "Registro exitoso", Toast.LENGTH_SHORT).show();
-                    } else {
-                        tvStatus.setText("❌ Error en registro: " + task.getException().getMessage());
-                        Log.e("REGISTER", "Error: ", task.getException());
-                    }
-                });
+        // Botón para ir a registro
+        btnGoRegister.setOnClickListener(v -> {
+            startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+            finish();
+        });
     }
 }

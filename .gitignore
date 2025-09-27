@@ -1,15 +1,27 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+# Gradle
+.gradle/
+build/
+*/build/
+.idea/caches
+.idea/libraries
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+
+# Logs
+*.log
+
+# Android
 .DS_Store
-/build
+/local.properties
+/.idea
+*.iml
 /captures
 .externalNativeBuild
 .cxx
-local.properties
+*.apk
+*.ap_
+
+# Firebase config (ignora google-services.json si lo subes privado)
+# /app/google-services.json
