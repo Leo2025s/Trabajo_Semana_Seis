@@ -1,24 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
     android:padding="24dp"
-    android:background="@android:color/white">
+    android:gravity="center_horizontal"
+    tools:context=".MainActivity"
+    android:background="#F5F5F5">
 
-    <!-- Texto de bienvenida -->
+    <!-- Título principal -->
     <TextView
-        android:id="@+id/tvWelcome"
+        android:id="@+id/tvTitulo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Bienvenido a DistribuidoraApp"
-        android:textSize="20sp"
+        android:text="📦 Cálculo de Despacho y Monitoreo de Temperatura"
+        android:textSize="18sp"
         android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:layout_marginBottom="24dp" />
+        android:gravity="center"
+        android:textColor="#000000"
+        android:layout_marginBottom="20dp" />
 
-    <!-- Campo de Monto -->
+    <!-- Temperatura desde Firebase -->
+    <TextView
+        android:id="@+id/tvTempFirebase"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Temperatura actual: -- °C"
+        android:textColor="#0D47A1"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:layout_marginBottom="16dp"
+        android:background="#E3F2FD"
+        android:padding="10dp"
+        android:elevation="2dp" />
+
+    <!-- Campo para ingresar monto de compra -->
     <EditText
         android:id="@+id/etMonto"
         android:layout_width="match_parent"
@@ -26,26 +43,44 @@
         android:hint="Ingrese monto de la compra"
         android:inputType="numberDecimal"
         android:padding="12dp"
-        android:layout_marginBottom="16dp"
-        android:background="@android:drawable/edit_text" />
+        android:background="@android:drawable/edit_text"
+        android:layout_marginBottom="16dp" />
 
-    <!-- Botón Calcular -->
+    <!-- Botón de cálculo -->
     <Button
         android:id="@+id/btnCalcular"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Calcular Despacho"
-        android:backgroundTint="@android:color/holo_orange_dark"
-        android:textColor="@android:color/white" />
+        android:text="Calcular Costo de Despacho"
+        android:backgroundTint="#0D47A1"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:padding="12dp"
+        android:layout_marginBottom="20dp" />
 
-    <!-- Resultado -->
+    <!-- Resultado del cálculo -->
     <TextView
         android:id="@+id/tvResult"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text=""
-        android:textSize="16sp"
-        android:textColor="@android:color/black"
-        android:layout_marginTop="20dp" />
+        android:text="Resultados aparecerán aquí"
+        android:textSize="15sp"
+        android:textColor="#212121"
+        android:background="#FFFFFF"
+        android:padding="16dp"
+        android:elevation="2dp"
+        android:gravity="start"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Nota informativa -->
+    <TextView
+        android:id="@+id/tvInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="* La aplicación alerta si la temperatura de la cadena de frío está fuera del rango definido."
+        android:textSize="13sp"
+        android:textColor="#757575"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="10dp" />
 
 </LinearLayout>

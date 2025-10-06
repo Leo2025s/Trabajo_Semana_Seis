@@ -6,15 +6,25 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
-import android.widget.TextView;
-import android.widget.EditText;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,9 +35,16 @@ public class MainActivity extends AppCompatActivity {
     private LocationManager locationManager;
     private double latUser = 0.0, lonUser = 0.0;
 
-    private TextView tvResult;
+    private TextView tvResult, tvTempFirebase;
     private EditText etMonto;
     private Button btnCalcular;
+
+    // Rango de temperatura definido por el administrador
+    private double minTemp = -20.0;
+    private double maxTemp = -10.0;
+
+    // Firebase
+    private DatabaseReference databaseRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +54,34 @@ public class MainActivity extends AppCompatActivity {
         etMonto = findViewById(R.id.etMonto);
         btnCalcular = findViewById(R.id.btnCalcular);
         tvResult = findViewById(R.id.tvResult);
+        tvTempFirebase = findViewById(R.id.tvTempFirebase);
 
-        // Verificar permisos
+        // Firebase Database
+        databaseRef = FirebaseDatabase.getInstance().getReference("temperatura");
+
+        // Escuchar cambios de temperatura en tiempo real
+        databaseRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    double temp = snapshot.getValue(Double.class);
+                    tvTempFirebase.setText("🌡 Temperatura actual: " + temp + " °C");
+
+                    if (temp < minTemp || temp > maxTemp) {
+                        reproducirAlerta();
+                    } else {
+                        Log.d("TEMP", "Temperatura dentro del rango permitido");
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                tvTempFirebase.setText("Error al leer temperatura de Firebase");
+            }
+        });
+
+        // Verificar permisos de ubicación
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
@@ -47,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
             obtenerUbicacion();
         }
 
+        // Calcular costo de despacho
         btnCalcular.setOnClickListener(v -> {
             if (latUser == 0.0 && lonUser == 0.0) {
                 tvResult.setText("⚠ Esperando ubicación GPS...");
@@ -60,22 +104,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
             double montoCompra = Double.parseDouble(montoStr);
-
-            // Calcular distancia usando tu clase Haversine
             double distancia = Haversine.calcularDistancia(latUser, lonUser, LAT_BODEGA, LON_BODEGA);
-
-            // Calcular costo de despacho usando tu clase CalculoDespacho
             double costo = CalculoDespacho.calcularCosto(montoCompra, distancia);
-
-            // Verificar temperatura (simulada)
-            boolean ok = ControlTemperatura.verificarTemperatura(-15.0);
 
             String resultado = "Monto compra: $" + montoCompra + "\n"
                     + "Ubicación cliente: (" + latUser + ", " + lonUser + ")\n"
                     + "Distancia a bodega: " + String.format("%.2f", distancia) + " km\n"
                     + "Costo de despacho: $" + costo + "\n";
-
-            resultado += ok ? "✔ Temperatura dentro del rango.\n" : "⚠ Alerta: Cadena de frío comprometida.\n";
 
             tvResult.setText(resultado);
 
@@ -84,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // Obtener ubicación
     private void obtenerUbicacion() {
         try {
             locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -110,6 +146,24 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Reproducir sonido y vibrar
+    private void reproducirAlerta() {
+        try {
+            MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.alerta);
+            mediaPlayer.start();
+
+            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            if (vibrator != null) {
+                vibrator.vibrate(VibrationEffect.createOneShot(1500, VibrationEffect.DEFAULT_AMPLITUDE));
+            }
+
+            Log.w("ALERTA", "⚠ Temperatura fuera del rango permitido. Sonido y vibración activados.");
+
+        } catch (Exception e) {
+            Log.e("ERROR_ALERTA", "Error al reproducir alerta: " + e.getMessage());
+        }
+    }
+
     // Manejar permisos
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
@@ -124,4 +178,3 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
-
